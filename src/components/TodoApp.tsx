@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent, MouseEvent } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { TodoForm } from "./TodoForm.tsx";
-import { TodoItem } from "./TodoItem.tsx";
+import { TodoForm } from "./TodoForm";
+import { TodoItem } from "./TodoItem";
 
 export type Todo = {
   id: string;
@@ -127,7 +127,7 @@ export const TodoApp = () => {
   }, [filter, todos]);
 
   return (
-    <>
+    <div className="todo-app">
       <h1>ToDo App</h1>
 
       {isEditable ? (
@@ -168,6 +168,6 @@ export const TodoApp = () => {
           />
         ))}
       </ul>
-    </>
+    </div>
   );
 };
