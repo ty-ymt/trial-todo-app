@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent, MouseEvent } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { TodoForm } from "./TodoForm.tsx";
+import { TodoItem } from "./TodoItem.tsx";
 
-type Todo = {
+export type Todo = {
   id: string;
   title: string;
   detail: string;
@@ -29,10 +31,10 @@ export const TodoApp = () => {
     setTodoDetail(e.target.value);
   };
 
-  const resetFormInput = () => {
-    setTodoTitle("");
-    setTodoDetail("");
-  };
+  // const resetFormInput = () => {
+  //   setTodoTitle("");
+  //   setTodoDetail("");
+  // };
 
   const handleAddTodo = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -47,7 +49,7 @@ export const TodoApp = () => {
     setTodos([...todos, newTodo]);
     setTodoTitle("");
     setTodoDetail("");
-    resetFormInput()
+    // resetFormInput()
   };
 
   const handleEditTitleChanges = (e: ChangeEvent<HTMLInputElement>) => {
@@ -81,9 +83,9 @@ export const TodoApp = () => {
           : todo
       )
     );
-    setNewTitle("")
-    setNewDetail("")
-    handleCloseEditForm()
+    setNewTitle("");
+    setNewDetail("");
+    handleCloseEditForm();
   };
 
   const handleDeleteTodo = (targetTodo: Todo) => {
@@ -91,7 +93,7 @@ export const TodoApp = () => {
   };
 
   const handleStatusChange = (
-    { id }: { id: string },
+    id: string,
     e: ChangeEvent<HTMLSelectElement>
   ) => {
     const newTodos = todos.map((todo) => ({ ...todo }));
@@ -109,65 +111,43 @@ export const TodoApp = () => {
     const filteringTodos = () => {
       switch (filter) {
         case "未着手":
-          setFilteredTodos(todos.filter((todo) => todo.status === "未着手"))
-          break
+          setFilteredTodos(todos.filter((todo) => todo.status === "未着手"));
+          break;
         case "進行中":
-          setFilteredTodos(todos.filter((todo) => todo.status === "進行中"))
-          break
+          setFilteredTodos(todos.filter((todo) => todo.status === "進行中"));
+          break;
         case "完了":
-          setFilteredTodos(todos.filter((todo) => todo.status === "完了"))
-          break
+          setFilteredTodos(todos.filter((todo) => todo.status === "完了"));
+          break;
         default:
-          setFilteredTodos(todos)
+          setFilteredTodos(todos);
       }
-    }
-    filteringTodos()
-  }, [filter, todos])
+    };
+    filteringTodos();
+  }, [filter, todos]);
 
   return (
     <>
       <h1>ToDo App</h1>
+
       {isEditable ? (
-        <>
-          <form>
-            <div>
-              <input
-                type="text"
-                value={newTitle}
-                onChange={handleEditTitleChanges}
-              />
-              <button onClick={handleEditTodo}>保存</button>
-              <button onClick={handleCloseEditForm}>キャンセル</button>
-            </div>
-            <div>
-              <textarea
-                rows={3}
-                value={newDetail}
-                onChange={handleEditDetailChanges}
-              />
-            </div>
-          </form>
-        </>
+        <TodoForm
+          title={newTitle}
+          detail={newDetail}
+          onTitleChange={handleEditTitleChanges}
+          onDetailChange={handleEditDetailChanges}
+          onSubmit={handleEditTodo}
+          onCancel={handleCloseEditForm}
+          isEdit
+        />
       ) : (
-        <>
-          <form>
-            <div>
-              <input
-                type="text"
-                value={todoTitle}
-                onChange={handleAddTitleChanges}
-              />
-              <button onClick={handleAddTodo}>追加</button>
-            </div>
-            <div>
-              <textarea
-                rows={3}
-                value={todoDetail}
-                onChange={handleAddDetailChanges}
-              />
-            </div>
-          </form>
-        </>
+        <TodoForm
+          title={todoTitle}
+          detail={todoDetail}
+          onTitleChange={handleAddTitleChanges}
+          onDetailChange={handleAddDetailChanges}
+          onSubmit={handleAddTodo}
+        />
       )}
 
       <select value={filter} onChange={(e) => setFilter(e.target.value)}>
@@ -179,34 +159,13 @@ export const TodoApp = () => {
 
       <ul>
         {filteredTodos.map((todo) => (
-          <li key={todo.id}>
-            <div>
-              <select
-                value={todo.status}
-                onChange={(e) => handleStatusChange(todo, e)}
-              >
-                <option value="未着手">未着手</option>
-                <option value="進行中">進行中</option>
-                <option value="完了">完了</option>
-              </select>
-              <span>{todo.title}</span>
-              <button
-                onClick={() => {
-                  handleOpenEditForm(todo);
-                }}
-              >
-                編集
-              </button>
-              <button
-                onClick={() => {
-                  handleDeleteTodo(todo);
-                }}
-              >
-                削除
-              </button>
-            </div>
-            <span>{todo.detail}</span>
-          </li>
+          <TodoItem
+            key={todo.id}
+            todo={todo}
+            onEdit={handleOpenEditForm}
+            onDelete={handleDeleteTodo}
+            onStatusChange={handleStatusChange}
+          />
         ))}
       </ul>
     </>
