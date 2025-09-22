@@ -8,7 +8,7 @@ export type Todo = {
   id: string;
   title: string;
   detail: string;
-  status: "未着手" | "進行中" | "完了";
+  status: "not-started" | "in-progress" | "completed"
 };
 
 export const TodoApp = () => {
@@ -20,7 +20,7 @@ export const TodoApp = () => {
   const [editId, setEditId] = useState<string>();
   const [newTitle, setNewTitle] = useState<string>("");
   const [newDetail, setNewDetail] = useState<string>("");
-  const [filter, setFilter] = useState<string>("全て");
+  const [filter, setFilter] = useState<string>("all");
   const [isEditable, setIsEditable] = useState<boolean>(false);
 
   const handleAddTitleChanges = (e: ChangeEvent<HTMLInputElement>) => {
@@ -44,7 +44,7 @@ export const TodoApp = () => {
       id: uuidv4(),
       title: todoTitle,
       detail: todoDetail,
-      status: "未着手",
+      status: "not-started",
     };
     setTodos([...todos, newTodo]);
     setTodoTitle("");
@@ -60,24 +60,10 @@ export const TodoApp = () => {
     setNewDetail(e.target.value);
   };
 
-  const handleOpenEditForm = ({ id, title, detail }: Todo) => {
-    setIsEditable(true);
-    setEditId(id);
-    setNewTitle(title);
-    setNewDetail(detail);
-  };
-
-  const handleCloseEditForm = () => {
-    setIsEditable(false);
-    setEditId(undefined);
-  };
-
   const handleEditTodo = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const newTodos = todos.map((todo) => ({ ...todo }));
-
     setTodos(
-      newTodos.map((todo) =>
+      todos.map((todo) =>
         todo.id === editId
           ? { ...todo, title: newTitle, detail: newDetail }
           : todo
@@ -92,17 +78,22 @@ export const TodoApp = () => {
     setTodos(todos.filter((todo) => todo !== targetTodo));
   };
 
-  const handleStatusChange = (
-    id: string,
-    e: ChangeEvent<HTMLSelectElement>
-  ) => {
-    const newTodos = todos.map((todo) => ({ ...todo }));
+  const handleOpenEditForm = ({ id, title, detail }: Todo) => {
+    setIsEditable(true);
+    setEditId(id);
+    setNewTitle(title);
+    setNewDetail(detail);
+  };
 
+  const handleCloseEditForm = () => {
+    setIsEditable(false);
+    setEditId(undefined);
+  };
+
+  const handleStatusChange = (id: string, newStatus: Todo["status"]) => {
     setTodos(
-      newTodos.map((todo) =>
-        todo.id === id
-          ? { ...todo, status: e.target.value as Todo["status"] }
-          : todo
+      todos.map((todo) =>
+        todo.id === id ? { ...todo, status: newStatus } : todo
       )
     );
   };
@@ -110,14 +101,14 @@ export const TodoApp = () => {
   useEffect(() => {
     const filteringTodos = () => {
       switch (filter) {
-        case "未着手":
-          setFilteredTodos(todos.filter((todo) => todo.status === "未着手"));
+        case "not-started":
+          setFilteredTodos(todos.filter((todo) => todo.status === "not-started"));
           break;
-        case "進行中":
-          setFilteredTodos(todos.filter((todo) => todo.status === "進行中"));
+        case "in-progress":
+          setFilteredTodos(todos.filter((todo) => todo.status === "in-progress"));
           break;
-        case "完了":
-          setFilteredTodos(todos.filter((todo) => todo.status === "完了"));
+        case "completed":
+          setFilteredTodos(todos.filter((todo) => todo.status === "completed"));
           break;
         default:
           setFilteredTodos(todos);
@@ -150,11 +141,15 @@ export const TodoApp = () => {
         />
       )}
 
-      <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-        <option value="全て">全て</option>
-        <option value="未着手">未着手</option>
-        <option value="進行中">進行中</option>
-        <option value="完了">完了</option>
+      <select
+        className="filter-select"
+        value={filter}
+        onChange={(e) => setFilter(e.target.value)}
+      >
+        <option value="all">全て</option>
+        <option value="not-started">未着手</option>
+        <option value="in-progress">進行中</option>
+        <option value="completed">完了</option>
       </select>
 
       <ul>
